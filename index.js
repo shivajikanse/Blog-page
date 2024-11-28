@@ -7,10 +7,8 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-
 // In-memory storage for blog posts
 let posts = [];
-
 
 app.get("/", (req, res) => {
   res.render("home.ejs", { posts });
@@ -32,10 +30,14 @@ app.get("/edit/:id", (req, res) => {
   res.render("edit.ejs", { post });
 });
 
+// Updated edit route
 app.post("/edit/:id", (req, res) => {
   const { title, content } = req.body;
-  const index = posts.findIndex(p => p.id === req.params.id);
-  posts[index] = { ...posts[index], title, content };
+  const id = req.params.id;
+  const index = posts.findIndex(p => p.id === id);
+  if (index !== -1) {
+    posts[index] = { ...posts[index], title, content };
+  }
   res.redirect("/");
 });
 
@@ -43,7 +45,6 @@ app.post("/delete/:id", (req, res) => {
   posts = posts.filter(p => p.id !== req.params.id);
   res.redirect("/");
 });
-
 
 app.listen(port, () => {
     console.log(`Server is listening at port ${port}`);
